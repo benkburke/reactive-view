@@ -1,4 +1,4 @@
-export default class HttpGateway {
+export default class Api {
   async get() {
     return Promise.resolve({
       firstName: "Jon",
