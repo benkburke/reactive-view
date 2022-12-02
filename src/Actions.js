@@ -1,16 +1,18 @@
-import { observable, observe } from "mobx";
-import Repository from "./Repository";
+import { makeAutoObservable, observe } from "mobx";
+import Store from "./Store";
 
-class Presenter {
-  @observable viewModel;
+class Actions {
+  viewModel = null;
 
   constructor() {
-    this.repository = new Repository();
+    this.store = new Store();
     this.viewModel = { formattedString: null, fName: null, lName: null };
+
+    makeAutoObservable(this);
   }
 
   load = async () => {
-    observe(this.repository, "programmersModel", obj => {
+    observe(this.store, "programmersModel", obj => {
       this.viewModel = {
         formattedString:
           "Hello your name is " + obj.newValue.fName + " " + obj.newValue.lName,
@@ -18,12 +20,13 @@ class Presenter {
         lName: obj.newValue.lName
       };
     });
-    await this.repository.load();
+
+    await this.store.load();
   };
 
   submit = viewModel => {
-    this.repository.updateProgrammersModel(viewModel.fName, viewModel.lName);
+    this.store.updateProgrammersModel(viewModel.fName, viewModel.lName);
   };
 }
 
-export const presenter = new Presenter();
+export const actions = new Actions();

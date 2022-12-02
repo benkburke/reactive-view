@@ -1,8 +1,11 @@
 import React from "react";
-import { actions } from "../../Actions";
+import { render } from "react-dom";
+import { actions } from "./Actions";
 import { observe } from "mobx";
+import { observer } from "mobx-react-lite";
+import ChildComponent from "./Child/ChildComponent";
 
-const ChildComponent = () => {
+const App = observer(() => {
   // binding output goes here
   const [viewModel, setViewModel] = React.useState({});
 
@@ -11,6 +14,8 @@ const ChildComponent = () => {
       observe(actions, "viewModel", obj => {
         setViewModel(obj.newValue);
       });
+
+      await actions.load();
     }
 
     load();
@@ -18,12 +23,23 @@ const ChildComponent = () => {
 
   return (
     <>
-      <h3>Reactive Child Child Component (1-way [up])</h3>
+      <h3>Reactive Parent Component (1-way [up & down])</h3>
+      {viewModel.formattedString}
+
+      <br />
+      <br />
 
       <input
         value={viewModel.fName}
         onChange={e => {
           setViewModel({ ...viewModel, fName: e.target.value });
+        }}
+      />
+
+      <input
+        value={viewModel.lName}
+        onChange={e => {
+          setViewModel({ ...viewModel, lName: e.target.value });
         }}
       />
 
@@ -34,8 +50,11 @@ const ChildComponent = () => {
       >
         Save
       </button>
+
+      <ChildComponent />
     </>
   );
-};
+});
 
-export default ChildComponent;
+const rootElement = document.getElementById("root");
+render(<App />, rootElement);
